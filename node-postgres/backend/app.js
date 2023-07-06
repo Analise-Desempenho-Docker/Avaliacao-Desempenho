@@ -1,22 +1,24 @@
-const server = require("express")
+const server = require("express");
+const bodyParser = require("body-parser");
+const db = require("./queries.js");
 const app = server();
 const PORT = 3000;
 
-const Client = require("pg").Client;
-const client = new Client({
-    user: "postgres",
-    host: "db",
-    database: "db",
-    password: "postgres",
-    port: "5432",
-});
+app.use(bodyParser.json());
+app.use(
+    bodyParser.urlencoded({
+        extended: true,
+    })
+);
 
-client.connect()
-    .then(() => console.log("Connected"))
+app.get('/', (request, response) => {
+    response.json({
+        info: "Basic movies API", 
+        paths: ["/movies", "/movies/:id"]
+    })
+})
 
-app.get('/', (req, res) => {
-    console.log("Some request");
-    res.end();
-});
+app.get('/movies', db.getAll);
+app.get('/movies/:id', db.getById);
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
