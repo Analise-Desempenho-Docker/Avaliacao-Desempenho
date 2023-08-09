@@ -23,6 +23,6 @@ services:
             - ./database:/docker-entrypoint-initdb.d/
             - db:${POSTGRES_DATA}        
         ports:
-            - "5432:5432"
+            - "5434:5432"
 volumes:
     db:
