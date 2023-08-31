@@ -5,6 +5,11 @@ services:
         cpus: 0.3
         volumes:
             - ./backend:/backend
+        environment:
+            DB_NAME: ${DB_NAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_USER: ${DB_USER}
+            DB_PORT: ${DB_PORT}
         ports:
             - 3000:3000
         depends_on:
@@ -15,13 +20,13 @@ services:
         mem_limit: 500m
         cpus: 0.3
         environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
-            PGDATA: ${POSTGRES_DATA} 
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD} 
+            #PGDATA: ${POSTGRES_DATA} 
         volumes: 
             - ./database:/docker-entrypoint-initdb.d/
-            - db:${POSTGRES_DATA}        
+            #- db:${POSTGRES_DATA}        
         ports:
             - "5434:5432"
 volumes:

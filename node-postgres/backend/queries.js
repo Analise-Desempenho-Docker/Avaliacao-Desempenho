@@ -1,16 +1,16 @@
 const Client = require("pg").Client;
 const client = new Client({
-    user: "postgres",
+    user: process.env.DB_USER,
     host: "postgres-db",
-    database: "db",
-    password: "postgres",
-    port: "5432",
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
 })
 
 client.connect().then(() => console.log("Connected"))
 
 const getAll = async (request, response) => {
-    const result = await client.query("SELECT * from movies ORDER BY id")
+    const result = await client.query("SELECT * from Student ORDER BY id")
     
     response.json(result.rows)
 }
@@ -18,7 +18,7 @@ const getAll = async (request, response) => {
 const getById = async (request, response) => {
     const id = parseInt(request.params.id)
     console.log(id)
-    const result = await client.query("SELECT * from movies WHERE id = $1", [id]) 
+    const result = await client.query("SELECT * from Student WHERE id = $1", [id]) 
     
     response.json(result.rows)
 }

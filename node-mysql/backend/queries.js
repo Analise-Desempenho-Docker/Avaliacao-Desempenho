@@ -1,12 +1,15 @@
 const mysql = require('mysql');
 const client = mysql.createPool({
     connectionLimit: 10,
-    port: "3306",
+    port: process.env.DB_PORT,
     host: "mysqldb",
-    database: "movies-db",
-    user: "root",
-    password: "password",
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
 })
+
+console.log(process.env.DB_USER)
+console.log(process.env.DB_PASSWORD)
 
 // client.connect((err) => {
 //    if (err) throw err;
