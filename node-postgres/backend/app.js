@@ -20,5 +20,6 @@ app.get('/', (request, response) => {
 
 app.get('/movies', db.getAll);
 app.get('/movies/:id', db.getById);
+app.post('/movies', db.create);
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

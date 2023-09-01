@@ -17,13 +17,22 @@ const getAll = async (request, response) => {
 
 const getById = async (request, response) => {
     const id = parseInt(request.params.id)
-    console.log(id)
     const result = await client.query("SELECT * from Student WHERE id = $1", [id]) 
     
     response.json(result.rows)
 }
 
+const create = async (request, response) => {
+    const {name, age} = request.body.data; 
+    console.log(name, age);
+
+    const result = await client.query("INSERT INTO Student(name, age) VALUES ($1, $2)", [name, age]);
+    
+    response.json(result);
+}
+
 module.exports = {
     getAll,
     getById,
+    create,
 }
