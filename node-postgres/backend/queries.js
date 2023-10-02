@@ -22,7 +22,7 @@ const getById = async (request, response) => {
     const result = await Movies.findOne({ where: { id } });
     response.json(result);
   } catch (err) {
-    response.status(500).json({ err });
+    response.status(500).json(err);
   }
 };
 
@@ -33,7 +33,18 @@ const create = async (request, response) => {
     const result = await Movies.create({ name, storyline, rating });
     response.json(result);
   } catch (err) {
-    response.status(500).json({ err });
+    response.status(500).json(err);
+  }
+};
+
+const deleteById = async (request, response) => {
+  const { id } = request.params;
+
+  try {
+    const result = Movies.destroy({ where: { id } });
+    response.json(result);
+  } catch (err) {
+    response.status(500).json(err);
   }
 };
 
@@ -41,4 +52,5 @@ module.exports = {
   getAll,
   getById,
   create,
+  deleteById,
 };

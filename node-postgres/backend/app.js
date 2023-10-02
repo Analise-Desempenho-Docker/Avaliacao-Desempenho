@@ -1,9 +1,10 @@
-const { sequelize } = require("./models");
 const server = require("express");
 const bodyParser = require("body-parser");
-// const db = require("./queries.js");
 const app = server();
 const PORT = 3000;
+
+const db = require("./queries.js");
+const { sequelize } = require("./models");
 
 app.use(bodyParser.json());
 app.use(
@@ -19,9 +20,10 @@ app.get("/", (request, response) => {
   });
 });
 
-// app.get("/movies", db.getAll);
-// app.get("/movies/:id", db.getById);
-// app.post("/movies", db.create);
+app.get("/movies", db.getAll);
+app.get("/movies/:id", db.getById);
+app.delete("/movies/:id", db.deleteById);
+app.post("/movies", db.create);
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);
