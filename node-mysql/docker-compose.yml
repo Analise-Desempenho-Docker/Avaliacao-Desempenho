@@ -32,5 +32,12 @@ services:
             - '5432:3306'
         expose: 
             - ${DB_PORT}
+    testLoader:
+        image: grafana/k6
+        depends_on:
+            - backend
+        volumes:
+            - ./loadTests:/scripts
+        command: 'run /scripts/index.js'
 volumes:
     db:
