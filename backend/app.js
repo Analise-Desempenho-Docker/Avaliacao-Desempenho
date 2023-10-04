@@ -26,8 +26,18 @@ app.delete("/movies/:id", db.deleteById);
 app.post("/movies", db.create);
 
 app.listen(PORT, async () => {
+  let isConnected = false;
+  const delay = 5000;
   console.log(`Listening on port ${PORT}`);
 
-  await sequelize.sync({ force: true });
-  console.log("Sequelize synced");
+  while (!isConnected) {
+    try {
+      await sequelize.sync({ force: true });
+      isConnected = true;
+      console.log("Sequelize synced");
+    } catch (err) {
+      console.log("Error trying to sync\nTrying to connect ...");
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
 });
