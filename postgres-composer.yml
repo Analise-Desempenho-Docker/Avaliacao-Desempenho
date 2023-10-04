@@ -10,12 +10,15 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_USER: ${DB_USER}
       DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+      NODE_ENV: postgresEnv
     ports:
       - 3000:3000
     depends_on:
-      - postgres-db
+      - database
     command: bash -c "cd /backend && npm i && node app"
-  postgres-db:
+
+  database:
     image: postgres
     mem_limit: 500m
     cpus: 0.3
@@ -23,8 +26,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5434:5432"
+
   testLoader:
     image: grafana/k6
     depends_on:
