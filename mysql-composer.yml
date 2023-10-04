@@ -1,43 +1,41 @@
 services:
-    backend:
-        image: node
-        mem_limit: 500m
-        cpus: 0.3
-        volumes:
-            - ./backend:/backend
-        environment:
-            DB_NAME: ${DB_NAME}
-            DB_USER: ${DB_USER}
-            DB_PASSWORD: ${DB_PASSWORD}
-            DB_PORT: ${DB_PORT}
-        ports:
-            - 3000:3000
-        depends_on:
-            - mysqldb
-        command: bash -c "cd /backend && npm i && node app"
+  backend:
+    image: node
+    mem_limit: 500m
+    cpus: 0.3
+    volumes:
+      - ./backend:/backend
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - 3000:3000
+    depends_on:
+      - mysqldb
+    command: bash -c "cd /backend && npm i && node app"
 
-    mysqldb:
-        image: mysql:8.0
-        mem_limit: 500m
-        cpus: 0.3
-        command: --default-authentication-plugin=mysql_native_password 
-        restart: always
-        volumes:
-            - ./database/init.sql:/docker-entrypoint-initdb.d/0_init.sql
-            - $HOME/database:/var/lib/mysql
-        environment:
-            MYSQL_DATABASE: ${DB_NAME}
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        ports:
-            - '5432:3306'
-        expose: 
-            - ${DB_PORT}
-    testLoader:
-        image: grafana/k6
-        depends_on:
-            - backend
-        volumes:
-            - ./loadTests:/scripts
-        command: 'run /scripts/index.js'
+  database:
+    image: mysql:8.0
+    mem_limit: 500m
+    cpus: 0.3
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:3306"
+    expose:
+      - ${DB_PORT}
+
+  testLoader:
+    image: grafana/k6
+    depends_on:
+      - backend
+    volumes:
+      - ./loadTests:/scripts
+    command: "run /scripts/index.js"
 volumes:
-    db:
+  db:
