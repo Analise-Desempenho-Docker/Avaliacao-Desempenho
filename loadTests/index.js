@@ -1,21 +1,27 @@
 import http from "k6/http";
 import { sleep } from "k6";
-import faker from "https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js";
+
+import generateMovie from "./movies.js";
+
+const baseUrl = "http://172.17.0.1:3000";
 
 export const options = {
-  vus: 10,
-  duration: "10s",
+  stages: [
+    { duration: "10s", target: 10 },
+    { duration: "30s", target: 50 },
+    { duration: "20s", target: 0 },
+  ],
+  tresholds: {
+    http_req_duration: ["p(90)<200", "p(95)<300"],
+  },
 };
 
 export default function () {
-  http.get("http://172.17.0.1:3000/movies");
+  // Consulta
+  http.get(`${baseUrl}/movies`);
 
-  const payload = JSON.stringify({
-    name: faker.name.firstName(),
-    storyline:
-      "amsdfma rajralsfasldfma ldf dfaskfd ld asdfansdfa sdfna sfalskma",
-    rating: 3.8,
-  });
+  const movie = generateMovie();
+  const payload = JSON.stringify(movie);
 
   const params = {
     headers: {
@@ -23,6 +29,14 @@ export default function () {
     },
   };
 
-  http.post("http://172.17.0.1:3000/movies", payload, params);
+  // Criacao
+  const resPost = http.post(`${baseUrl}/movies`, payload, params);
+
+  // Remocao
+  if (resPost.status == 200) {
+    const movieId = JSON.parse(resPost.body).id;
+    http.del(`${baseUrl}/movies/${movieId}`);
+  }
+
   sleep(1);
 }
