@@ -1,0 +1,6 @@
+services:
+  test_loader:
+    image: grafana/k6
+    volumes:
+      - ./loadTests:/scripts
+    command: "run /scripts/index.js"

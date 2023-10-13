@@ -26,13 +26,5 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-
-  testLoader:
-    image: grafana/k6
-    depends_on:
-      - backend
-    volumes:
-      - ./loadTests:/scripts
-    command: "run /scripts/index.js"
 volumes:
   db:
