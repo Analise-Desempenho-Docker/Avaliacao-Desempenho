@@ -2,19 +2,11 @@ import http from "k6/http";
 import { sleep } from "k6";
 
 import generateMovie from "./movies.js";
+import { smoke, breakpoint } from "./options.js";
 
 const baseUrl = "http://172.17.0.1:3000";
 
-export const options = {
-  stages: [
-    { duration: "10s", target: 10 },
-    { duration: "30s", target: 50 },
-    { duration: "20s", target: 0 },
-  ],
-  tresholds: {
-    http_req_duration: ["p(90)<200", "p(95)<300"],
-  },
-};
+export const options = breakpoint;
 
 export default function () {
   // Consulta
