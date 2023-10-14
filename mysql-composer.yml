@@ -31,13 +31,5 @@ services:
       - "3306:3306"
     expose:
       - "3306"
-
-  # testLoader:
-  #   image: grafana/k6
-  #   depends_on:
-  #     - backend
-  #   volumes:
-  #     - ./loadTests:/scripts
-  #   command: "run /scripts/index.js"
 volumes:
   db:
