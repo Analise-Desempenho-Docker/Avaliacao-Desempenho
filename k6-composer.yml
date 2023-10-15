@@ -1,6 +1,7 @@
 services:
   test_loader:
+    user: "root:root"
     image: grafana/k6
     volumes:
-      - ./loadTests:/scripts
-    command: "run /scripts/index.js"
+      - ./loadTests:/scripts:bind
+    command: "run /scripts/index.js --out json=/scripts/result.json"
