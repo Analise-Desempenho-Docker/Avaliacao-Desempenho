@@ -7,29 +7,18 @@ services:
       - ./backend:/backend
     environment:
       DB_NAME: ${DB_NAME}
-      DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}
       NODE_ENV: mysqlEnv
     ports:
       - 3000:3000
-    depends_on:
-      - database
     command: bash -c "cd /backend && npm i && node app"
 
   database:
     image: mysql:5.7
     mem_limit: 500m
     cpus: 0.3
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
-    expose:
-      - "3306"
-volumes:
-  db:
