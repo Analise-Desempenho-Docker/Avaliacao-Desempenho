@@ -43,7 +43,6 @@ function generateBackend(image, cpus, ram) {
       NODE_ENV: "postgresEnv",
     },
     ports: ["3000:3000"],
-    depends_on: ["database"],
     command: '/bin/sh -c "cd /backend && npm i && node app"',
   };
 }
@@ -72,3 +71,33 @@ function generateDatabase(database, cpus, ram) {
 
   return result[database] || {};
 }
+
+// run all compose files
+const util = require("node:util");
+const exec = util.promisify(require("node:child_process").exec);
+
+const end_command =
+  "docker compose -f ./compose_files/compose_1.yaml down && docker compose -f ./compose_files/k6-composer.yaml down";
+
+async function runBackend() {
+  console.log("RUNNING BACKEND");
+  const { stdout, stderr } = await exec(
+    "docker compose -f ./compose_files/compose_1.yaml up --remove-orphans --force-recreate"
+  );
+}
+
+async function runTests() {
+  console.log("RUNNING TESTS");
+  const { stdout, stderr } = await exec(
+    "docker compose -f ./compose_files/k6-composer.yaml up --remove-orphans --force-recreate"
+  );
+}
+
+async function endComposers() {
+  const { stdout, stderr } = await exec(end_command);
+}
+
+runBackend();
+setTimeout(() => {
+  runTests().then(endComposers);
+}, 20 * 1000);

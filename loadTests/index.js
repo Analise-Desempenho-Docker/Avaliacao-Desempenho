@@ -6,7 +6,7 @@ import { smoke, breakpoint } from "./options.js";
 
 const baseUrl = "http://172.17.0.1:3000";
 
-export const options = breakpoint;
+export const options = smoke;
 
 export default function () {
   // Consulta

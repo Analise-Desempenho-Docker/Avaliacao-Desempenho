@@ -1,7 +1,7 @@
 // Smoke
 const smoke = {
   vus: 5,
-  duration: "1m",
+  duration: "10s",
 };
 
 // Load

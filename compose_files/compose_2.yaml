@@ -13,8 +13,6 @@ services:
       NODE_ENV: mysqlEnv
     ports:
       - 3000:3000
-    depends_on:
-      - database
     command: /bin/sh -c "cd /backend && npm i && node app"
   database:
     image: mysql:5.7
