@@ -1,0 +1,38 @@
+[
+  {
+    "backend": {
+      "image": "node",
+      "mem_limit": "500m",
+      "cpus": 0.5
+    },
+    "database": {
+      "image": "postgres",
+      "mem_limit": "500m",
+      "cpus": 0.5
+    }
+  },
+  {
+    "backend": {
+      "image": "node",
+      "mem_limit": "200m",
+      "cpus": 1
+    },
+    "database": {
+      "image": "mysql",
+      "mem_limit": "300m",
+      "cpus": 0.3
+    }
+  },
+  {
+    "backend": {
+      "image": "node",
+      "mem_limit": "750m",
+      "cpus": 1.5
+    },
+    "database": {
+      "image": "postgres",
+      "mem_limit": "250m",
+      "cpus": 0.4
+    }
+  }
+]

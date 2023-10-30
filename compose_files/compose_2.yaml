@@ -1,10 +1,10 @@
 services:
   backend:
-    image: node
-    mem_limit: 500m
-    cpus: 0.3
+    image: node:21-alpine3.17
+    mem_limit: 200m
+    cpus: 1
     volumes:
-      - ./backend:/backend
+      - ../backend:/backend
     environment:
       DB_NAME: ${DB_NAME}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -13,11 +13,12 @@ services:
       NODE_ENV: mysqlEnv
     ports:
       - 3000:3000
-    command: bash -c "cd /backend && npm i && node app"
-
+    depends_on:
+      - database
+    command: /bin/sh -c "cd /backend && npm i && node app"
   database:
     image: mysql:5.7
-    mem_limit: 500m
+    mem_limit: 300m
     cpus: 0.3
     environment:
       MYSQL_DATABASE: ${DB_NAME}

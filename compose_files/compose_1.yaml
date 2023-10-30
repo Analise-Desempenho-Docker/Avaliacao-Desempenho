@@ -1,0 +1,25 @@
+services:
+  backend:
+    image: node:21-alpine3.17
+    mem_limit: 500m
+    cpus: 0.5
+    volumes:
+      - ../backend:/backend
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+      NODE_ENV: postgresEnv
+    ports:
+      - 3000:3000
+    depends_on:
+      - database
+    command: /bin/sh -c "cd /backend && npm i && node app"
+  database:
+    image: postgres:16-alpine3.18
+    mem_limit: 500m
+    cpus: 0.5
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}

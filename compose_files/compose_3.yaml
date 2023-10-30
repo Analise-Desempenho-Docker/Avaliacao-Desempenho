@@ -1,10 +1,10 @@
 services:
   backend:
-    image: node
-    mem_limit: 500m
-    cpus: 0.3
+    image: node:21-alpine3.17
+    mem_limit: 750m
+    cpus: 1.5
     volumes:
-      - ./backend:/backend
+      - ../backend:/backend
     environment:
       DB_NAME: ${DB_NAME}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -13,12 +13,13 @@ services:
       NODE_ENV: postgresEnv
     ports:
       - 3000:3000
-    command: bash -c "cd /backend && npm i && node app"
-
+    depends_on:
+      - database
+    command: /bin/sh -c "cd /backend && npm i && node app"
   database:
-    image: postgres
-    mem_limit: 500m
-    cpus: 0.3
+    image: postgres:16-alpine3.18
+    mem_limit: 250m
+    cpus: 0.4
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
