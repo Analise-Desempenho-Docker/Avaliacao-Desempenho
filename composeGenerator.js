@@ -75,14 +75,12 @@ function generateDatabase(database, cpus, ram) {
 // run all compose files
 const util = require("node:util");
 const exec = util.promisify(require("node:child_process").exec);
+const sleep = util.promisify(setTimeout);
 
-const end_command =
-  "docker compose -f ./compose_files/compose_1.yaml down && docker compose -f ./compose_files/k6-composer.yaml down";
-
-async function runBackend() {
+async function runBackend(file_path) {
   console.log("RUNNING BACKEND");
   const { stdout, stderr } = await exec(
-    "docker compose -f ./compose_files/compose_1.yaml up --remove-orphans --force-recreate"
+    `docker compose -f ${file_path} up --remove-orphans --force-recreate`
   );
 }
 
@@ -93,11 +91,34 @@ async function runTests() {
   );
 }
 
-async function endComposers() {
-  const { stdout, stderr } = await exec(end_command);
+async function exitContainers(file_path) {
+  console.log("END TESTS");
+  const { stdout, stderr } = await exec(
+    `docker compose -f ${file_path} down; docker compose -f ./compose_files/k6-composer.yaml`
+  );
 }
 
-runBackend();
-setTimeout(() => {
-  runTests().then(endComposers);
-}, 20 * 1000);
+//const composeFiles = fs.readdirSync(COMPOSE_FILE_PATH);
+
+async function getPerfomaceEvaluation(file_path) {
+  // start compose file
+  runBackend(file_path);
+  // await
+  await sleep(20 * 1000);
+  await runTests();
+  // end containers execution
+  exitContainers(file_path);
+}
+
+async function getAllEvaluations() {
+  const results = [];
+
+  for (const file of composeFiles) {
+    const result = await getPerfomaceEvaluation(file);
+    results.push(result);
+  }
+
+  return results;
+}
+
+getPerfomaceEvaluation("./compose_files/compose_1.yaml");
