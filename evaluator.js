@@ -9,21 +9,21 @@ const sleep = util.promisify(setTimeout);
 async function runBackend(file_path) {
   console.log("RUNNING BACKEND");
   const { stdout, stderr } = await exec(
-    `docker compose -f ${file_path} up --remove-orphans --force-recreate`
+    `docker compose -f ${file_path} up --remove-orphans --force-recreate --detach`
   );
 }
 
 async function runTests() {
   console.log("RUNNING TESTS");
   const { stdout, stderr } = await exec(
-    "docker compose -f ./compose_files/k6-composer.yaml up --remove-orphans --force-recreate"
+    "docker compose -f ./compose_files/k6-composer.yaml up"
   );
 }
 
 async function exitContainers(file_path) {
   console.log("END TESTS");
   const { stdout, stderr } = await exec(
-    `docker compose -f ${file_path} down; docker compose -f ./compose_files/k6-composer.yaml`
+    `docker compose -f ${file_path} down; docker compose -f ./compose_files/k6-composer.yaml down`
   );
 }
 
