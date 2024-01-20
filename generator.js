@@ -1,3 +1,5 @@
+const address = 'http://165.227.114.218:8000';
+
 const constants = require("./constants.js");
 const evaluator = require("./evaluator.js");
 
@@ -33,32 +35,36 @@ for (const { backend, database } of configs) {
 }
 
 function generateBackend(image, cpus, ram) {
+  const {DB_NAME, DB_PASSWORD, DB_PORT, DB_HOST} = process.env;
+
   return {
     image: "node:21-alpine3.17",
     mem_limit: ram,
     cpus,
-    volumes: ["../backend:/backend"],
+    volumes: ["./application:/application"],
     environment: {
-      DB_NAME: "${DB_NAME}",
-      DB_PASSWORD: "${DB_PASSWORD}",
-      DB_PORT: "${DB_PORT}",
-      DB_HOST: "${DB_HOST}",
+      DB_NAME: DB_NAME,
+      DB_PASSWORD: DB_PASSWORD,
+      DB_PORT: DB_PORT,
+      DB_HOST: DB_HOST,
       NODE_ENV: "postgresEnv",
     },
     ports: ["3000:3000"],
-    command: '/bin/sh -c "cd /backend && npm i && node app"',
+    command: '/bin/sh -c "cd /application && npm i && node app"',
   };
 }
 
 function generateDatabase(database, cpus, ram) {
+  const {DB_NAME, DB_PASSWORD} = process.env;
+  
   const result = {
     postgres: {
       image: "postgres:16-alpine3.18",
       mem_limit: ram,
       cpus,
       environment: {
-        POSTGRES_DB: "${DB_NAME}",
-        POSTGRES_PASSWORD: "${DB_PASSWORD}",
+        POSTGRES_DB: DB_NAME,
+        POSTGRES_PASSWORD: DB_PASSWORD,
       },
     },
     mysql: {
@@ -66,8 +72,8 @@ function generateDatabase(database, cpus, ram) {
       mem_limit: ram,
       cpus,
       environment: {
-        MYSQL_DATABASE: "${DB_NAME}",
-        MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}",
+        MYSQL_DATABASE: DB_NAME,
+        MYSQL_ROOT_PASSWORD: DB_PASSWORD,
       },
     },
   };
@@ -75,11 +81,21 @@ function generateDatabase(database, cpus, ram) {
   return result[database] || {};
 }
 
-evaluator
-  .getAllEvaluations(constants.COMPOSE_DIR)
-  .then((results) =>
+//evaluator.runBackend(address, fs.readFileSync('./compose_files/compose_1.yaml', {encoding: 'utf-8', flag: 'r'}));
+
+evaluator.getPerfomaceEvaluation(address, fs.readFileSync('./compose_files/compose_1.yaml', {encoding: 'utf-8', flag: 'r'}))
+  .then(value => {
     fs.writeFileSync(
       constants.EVALUATION_FILE,
-      JSON.stringify(results, null, 2)
+      JSON.stringify(value, null, 2)
     )
-  );
+  })
+
+// evaluator
+//   .getAllEvaluations(constants.COMPOSE_DIR)
+//   .then((results) =>
+//     fs.writeFileSync(
+//       constants.EVALUATION_FILE,
+//       JSON.stringify(results, null, 2)
+//     )
+//   );

@@ -4,7 +4,7 @@ import { sleep } from "k6";
 import generateMovie from "./movies.js";
 import { smoke, breakpoint } from "./options.js";
 
-const baseUrl = "http://172.17.0.1:3000";
+const baseUrl = "http://165.227.114.218:3000";
 
 export const options = smoke;
 

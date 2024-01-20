@@ -6,11 +6,23 @@ const util = require("node:util");
 const exec = util.promisify(require("node:child_process").exec);
 const sleep = util.promisify(setTimeout);
 
-async function runBackend(file_path) {
-  console.log("RUNNING BACKEND");
-  const { stdout, stderr } = await exec(
-    `docker compose -f ${file_path} up --remove-orphans --force-recreate --detach`
-  );
+async function runBackend(address, composeInfo) {
+  console.log("RUNNING CONTAINER");
+  console.log(composeInfo);
+
+  const result = await fetch(address, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({composeInfo})
+  });
+}
+
+async function dropBackend(address) {
+  console.log('DROPING CONTAINER')
+  const result = await fetch(`${address}/down`, {method: 'POST'});
+  return result;
 }
 
 async function runTests() {
@@ -20,11 +32,11 @@ async function runTests() {
   );
 }
 
-async function exitContainers(file_path) {
-  console.log("END TESTS");
-  const { stdout, stderr } = await exec(
-    `docker compose -f ${file_path} down; docker compose -f ./compose_files/k6-composer.yaml down`
-  );
+async function exitContainers(address) {
+  const command = 'docker compose -f ./compose_files/k6-composer.yaml down';
+  const result = await Promise.all([dropBackend(address), exec(command)]);
+
+  return result;
 }
 
 function getK6Json(file_path) {
@@ -40,19 +52,21 @@ function getK6Json(file_path) {
   return result;
 }
 
-async function getPerfomaceEvaluation(file_path) {
+async function getPerfomaceEvaluation(address, composeInfo) {
   // start compose file
-  runBackend(file_path);
+  runBackend(address, composeInfo);
   // await
   await sleep(20 * 1000);
   await runTests();
   // end containers execution
-  await exitContainers(file_path);
+  await exitContainers(address);
+
+  await sleep(5 * 1000);
 
   return getK6Json(constants.RESULT_FILE);
 }
 
-async function getAllEvaluations(dir_path) {
+async function getAllEvaluations(address, dir_path) {
   const composeFiles = fs.readdirSync(dir_path);
   const regex = new RegExp("^compose_[0-9]+.yaml$");
   const results = {};
@@ -64,7 +78,8 @@ async function getAllEvaluations(dir_path) {
     console.log(`EVALUATING ${file} ...`);
 
     const filename = `${dir_path}/${file}`;
-    const result = await getPerfomaceEvaluation(filename);
+    const composeInfo = fs.readFileSync(filename, {encoding: 'utf-8', flag: 'r'});
+    const result = await getPerfomaceEvaluation(address, composeInfo);
     results[file] = result;
   }
 
@@ -75,5 +90,6 @@ if (typeof module !== "undefined") {
   module.exports = {
     getAllEvaluations,
     getPerfomaceEvaluation,
+    runBackend,
   };
 }
